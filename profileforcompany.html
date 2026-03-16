@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الملف الشخصي للباحث عن عمل</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container" id="printArea">
+
+    <div class="header">
+        <h2>الملف الشخصي للباحث عن عمل</h2>
+        <span>نظام خدمات الباحثين عن عمل</span>
+    </div>
+
+    <!-- الصورة -->
+    <div class="profile-img">
+        <img id="profilePreview" src="profile.png" onclick="uploadImage()">
+        <input type="file" id="profileImage" accept="image/*" hidden>
+        <small>اضغط على الصورة لتغييرها</small>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="openTab('personal')">المعلومات الشخصية</button>
+        <button class="tab" onclick="openTab('contact')">التواصل والسيرة</button>
+        <button class="tab" onclick="openTab('education')">التعليم</button>
+        <button class="tab" onclick="openTab('trainingTab')">التدريب والشهادات</button>
+        <button class="tab" onclick="openTab('socialStatusTab')">الوضع الاجتماعي</button>
+		
+    </div>
+
+    <!-- Tab: المعلومات الشخصية -->
+    <div id="personal" class="tab-content active">
+        <fieldset>
+            <legend>البيانات الأساسية</legend>
+            <div class="form-row">
+                <label>الرقم المدني</label>
+                <input type="text" value="12345678" readonly>
+            </div>
+            <div class="form-row">
+                <label>الاسم الكامل</label>
+                <input type="text" value="محمد أحمد سالم" readonly>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>تاريخ الميلاد</label>
+                    <input type="text" value="1995/05/12" readonly>
+                </div>
+                <div class="form-row">
+                    <label>العمر</label>
+                    <input type="text" value="29" readonly>
+                </div>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>المحافظة</label>
+                    <input type="text" value="مسقط" readonly>
+                </div>
+                <div class="form-row">
+                    <label>الولاية</label>
+                    <input type="text" value="بوشر" readonly>
+                </div>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>الحالة الاجتماعية</label>
+                    <input type="text" value="أعزب" readonly>
+                </div>
+                <div class="form-row">
+                    <label>الحالة الصحية</label>
+                    <input type="text" value="سليم" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>حالة الباحث عن عمل</label>
+                <input type="text" value="نشط" readonly>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>أول تسجيل للبحث عن عمل</label>
+                    <input type="text" value="2021/01/10" readonly>
+                </div>
+                <div class="form-row">
+                    <label>آخر تسجيل للبحث عن عمل</label>
+                    <input type="text" value="2024/02/01" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>مدة البحث عن عمل</label>
+                <input type="text" value="3 سنوات" readonly>
+            </div>
+        </fieldset>
+    </div>
+
+    <!-- Tab: التواصل والسيرة -->
+    <div id="contact" class="tab-content">
+        <fieldset>
+            <legend>بيانات التواصل والسيرة الذاتية</legend>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>رقم الهاتف</label>
+                    <input type="tel" id="phone">
+                </div>
+                <div class="form-row">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="email">
+                </div>
+            </div>
+            <div class="form-row">
+                <label>عنوان السكن</label>
+                <input type="text" id="address">
+            </div>
+            <hr class="divider">
+            <div class="form-row">
+                <label>السيرة الذاتية (نص)</label>
+                <textarea id="cvText" rows="5"></textarea>
+            </div>
+            <div class="form-row">
+                <label>تحميل ملف السيرة الذاتية</label>
+                <input type="file" id="cvFile" accept=".pdf,.doc,.docx">
+            </div>
+        </fieldset>
+    </div>
+
+    <!-- Tab: التعليم -->
+    <div id="education" class="tab-content">
+        <fieldset>
+            <legend>التعليم الجامعي</legend>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>التخصص الجامعي</label>
+                    <input type="text" value="هندسة اتصالات" readonly>
+                </div>
+                <div class="form-row">
+                    <label>المؤسسة التعليمية</label>
+                    <input type="text" value="جامعة مسقط" readonly>
+                </div>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>الدرجة العلمية</label>
+                    <input type="text" value="بكالوريوس" readonly>
+                </div>
+                <div class="form-row">
+                    <label>المعدل</label>
+                    <input type="text" value="3.75" readonly>
+                </div>
+            </div>
+            <div class="two-cols">
+                <div class="form-row">
+                    <label>المستوى التعليمي</label>
+                    <input type="text" value="جامعي" readonly>
+                </div>
+                <div class="form-row">
+                    <label>دولة التخرج</label>
+                    <input type="text" value="سلطنة عمان" readonly>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>سنة التخرج</label>
+                <input type="text" value="2020" readonly>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>الثانوية / الدبلوم العام</legend>
+            <div class="form-row">
+                <label>المعدل الكامل</label>
+                <input type="text" value="95%" readonly>
+            </div>
+            <div class="three-cols">
+                <div class="form-row">
+                    <label>درجة اللغة العربية</label>
+                    <input type="text" value="98" readonly>
+                </div>
+                <div class="form-row">
+                    <label>درجة اللغة الإنجليزية</label>
+                    <input type="text" value="92" readonly>
+                </div>
+                <div class="form-row">
+                    <label>درجة الرياضيات</label>
+                    <input type="text" value="97" readonly>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>الشهادات العليا</legend>
+            <div id="higherDegreesList"></div>
+            <button type="button" onclick="addHigherDegree()">إضافة شهادة عليا</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>جميع الشهادات</legend>
+            <table id="degreesTable">
+                <thead>
+                    <tr>
+                        <th>الدرجة</th>
+                        <th>التخصص</th>
+                        <th>المؤسسة</th>
+                        <th>الدولة</th>
+                        <th>سنة التخرج</th>
+                        <th>المعدل</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </fieldset>
+    </div>
+
+    <!-- Tab: التدريب والشهادات المهنية -->
+    <div id="trainingTab" class="tab-content">
+        <fieldset>
+            <legend>التدريب والشهادات المهنية</legend>
+            <button type="button" onclick="addTrainingCertificate()">إضافة شهادة جديدة</button>
+
+            <table id="trainingTable">
+                <thead>
+                    <tr>
+                        <th>الرقم التسلسلي</th>
+                        <th>رقم الشهادة</th>
+                        <th>اسم الشهادة</th>
+                        <th>مزود الشهادة</th>
+                        <th>تاريخ الإصدار</th>
+                        <th>تاريخ الانتهاء</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </fieldset>
+
+        <fieldset>
+            <legend>البرامج التدريبية العملية</legend>
+            <button type="button" onclick="addPracticalTraining()">إضافة تدريب عملي</button>
+
+            <table id="practicalTrainingTable">
+                <thead>
+                    <tr>
+                        <th>الرقم التسلسلي</th>
+                        <th>المؤسسة المانحة</th>
+                        <th>مجال التدريب</th>
+                        <th>الفترة من</th>
+                        <th>الفترة إلى</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </fieldset>
+    </div>
+
+    <!-- Tab: الوضع الاجتماعي -->
+    <div id="socialStatusTab" class="tab-content">
+        <fieldset>
+            <legend>الوضع الاجتماعي للباحث</legend>
+            <div class="form-row">
+                <label>أسر الضمان الاجتماعي</label>
+                <input type="text" value="نعم" readonly>
+            </div>
+            <div class="form-row">
+                <label>أسر الدخل المحدود</label>
+                <input type="text" value="لا" readonly>
+            </div>
+            <div class="form-row">
+                <label>مستوى دخل الأسرة</label>
+                <input type="text" value="متوسط" readonly>
+            </div>
+            <div class="form-row">
+                <label>ملاحظات إضافية</label>
+                <input type="text" value="لا توجد" readonly>
+            </div>
+        </fieldset>
+    </div>
+
+
+
+
+
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

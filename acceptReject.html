@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title> تقرير الباحثين عن عمل الذين تم ترشيحهم</title>
+<style>
+body { font-family: Arial; direction: rtl; margin:20px; background:#f0f2f5;}
+h2,h3 { text-align:center; margin-bottom:10px; }
+section { background:#fff; padding:15px; border-radius:8px; margin-bottom:20px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+table { width:100%; border-collapse: collapse; background:#fff; margin-top:10px;}
+th,td { border:1px solid #ccc; padding:6px; text-align:center; font-size:13px; }
+th { background:#e9ecef; }
+button { padding:5px 10px; border:none; border-radius:4px; cursor:pointer; font-size:12px; margin:2px;}
+button.print { background:#007bff; color:#fff; }
+button.export { background:#28a745; color:#fff; }
+button.print:hover { background:#0056b3;}
+button.export:hover { background:#1e7e34;}
+.search-filters { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;}
+.search-filters div { display:flex; flex-direction:column; }
+select,input { padding:6px; border-radius:4px; border:1px solid #ccc; }
+canvas {background:#fff; border:1px solid #ccc; border-radius:8px; padding:10px; margin-top:10px;}
+.flex-section { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:flex-start;}
+.chart-small { width:200px; height:200px;}
+</style>
+</head>
+<body>
+
+<h2>تقرير الباحثين عن عمل الذين تم ترشيحهم</h2>
+
+<!-- البحث المتقدم أول شيء -->
+<section>
+<h3>بحث متقدم</h3>
+<div class="search-filters">
+  <div>
+    <label>الباحث</label>
+    <input type="text" id="searchName" placeholder="بحث بالاسم">
+  </div>
+  <div>
+    <label>الرقم المدني</label>
+    <input type="text" id="searchCivil" placeholder="بحث بالرقم المدني">
+  </div>
+  <div>
+    <label>الشركة</label>
+    <select id="searchCompany">
+      <option value="">الكل</option>
+    </select>
+  </div>
+  <div>
+    <label>سنة الترشيح</label>
+    <select id="searchYear">
+      <option value="">الكل</option>
+    </select>
+  </div>
+  <div>
+    <label>الحالة</label>
+    <select id="searchStatus">
+      <option value="">الكل</option>
+      <option value="تم التوظيف">تم التوظيف</option>
+      <option value="رفض">رفض</option>
+    </select>
+  </div>
+  <div style="align-self:end;">
+    <button onclick="filterTables()">بحث</button>
+  </div>
+</div>
+</section>
+
+<!-- تقرير الباحثين -->
+<section class="flex-section">
+<div style="flex:1; min-width:400px;">
+<h3>الباحثون الذين تم توظيفهم</h3>
+<div style="text-align:right; margin-bottom:5px;">
+  <button class="export" onclick="exportCSV('hired')">CSV</button>
+  <button class="export" onclick="exportExcel('hired')">Excel</button>
+  <button class="print" onclick="exportPDF('hired')">PDF</button>
+</div>
+<table id="hiredTable">
+<thead>
+<tr>
+<th>الاسم</th>
+<th>الرقم المدني</th>
+<th>الشركة / الشركات</th>
+<th>المسمى الوظيفي</th>
+<th>تاريخ التوظيف</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+<div style="flex:0 0 220px;">
+<h3>نسبة التوظيف</h3>
+<canvas id="chartHiredPie" class="chart-small"></canvas>
+</div>
+</section>
+
+<section class="flex-section">
+<div style="flex:1; min-width:400px;">
+<h3>الباحثون الذين تم رفضهم</h3>
+<div style="text-align:right; margin-bottom:5px;">
+  <button class="export" onclick="exportCSV('rejected')">CSV</button>
+  <button class="export" onclick="exportExcel('rejected')">Excel</button>
+  <button class="print" onclick="exportPDF('rejected')">PDF</button>
+</div>
+<table id="rejectedTable">
+<thead>
+<tr>
+<th>الاسم</th>
+<th>الرقم المدني</th>
+<th>الشركة / الشركات</th>
+<th>سبب الرفض</th>
+<th>تقدير المقابلة</th>
+<th>ملاحظات</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+<div style="flex:0 0 220px;">
+<h3>نسبة الرفض</h3>
+<canvas id="chartRejectedPie" class="chart-small"></canvas>
+</div>
+</section>
+
+<!-- الرسم البياني العام -->
+<section>
+<h3>رسم بياني تفاعلي للترشيحات</h3>
+<div style="display:flex; gap:10px; justify-content:center; align-items:center; margin-bottom:10px;">
+  <div>
+    <label>الشركة</label>
+    <select id="chartCompanyFilter" onchange="updateChart()">
+      <option value="">الكل</option>
+    </select>
+  </div>
+  <div>
+    <label>سنة الترشيح</label>
+    <select id="chartYearFilter" onchange="updateChart()">
+      <option value="">الكل</option>
+    </select>
+  </div>
+</div>
+<canvas id="chartCanvas" width="700" height="300"></canvas>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// بيانات تجريبية
+let candidates = [
+  {civilId:"123456789", name:"أحمد محمد علي", nominations:[{company:"شركة الاتصالات", date:"2023-01-10"}], employment:{status:"تم التوظيف", jobTitle:"مهندس برمجيات", hireDate:"2023-02-01"}},
+  {civilId:"987654321", name:"فاطمة سالم", nominations:[{company:"شركة تقنية المعلومات", date:"2023-01-15"}], employment:{status:"رفض", rejectionReason:"لم يستوفِ شروط التوظيف", interviewScore:"جيد", notes:"تحتاج خبرة إضافية"}},
+  {civilId:"112233445", name:"سلمان عبدالله", nominations:[{company:"نفط عمان", date:"2023-01-20"}], employment:{status:"تم التوظيف", jobTitle:"محلل نظم", hireDate:"2023-02-10"}}
+];
+
+// تحديث الجداول
+function updateTables(){
+  const hiredBody = document.querySelector("#hiredTable tbody");
+  const rejectedBody = document.querySelector("#rejectedTable tbody");
+  hiredBody.innerHTML="";
+  rejectedBody.innerHTML="";
+  candidates.forEach(c=>{
+    if(c.employment.status==="تم التوظيف"){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.name}</td><td>${c.civilId}</td><td>${c.nominations.map(n=>n.company).join(", ")}</td><td>${c.employment.jobTitle}</td><td>${c.employment.hireDate}</td>`;
+      hiredBody.appendChild(tr);
+    } else if(c.employment.status==="رفض"){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.name}</td><td>${c.civilId}</td><td>${c.nominations.map(n=>n.company).join(", ")}</td><td>${c.employment.rejectionReason}</td><td>${c.employment.interviewScore}</td><td>${c.employment.notes}</td>`;
+      rejectedBody.appendChild(tr);
+    }
+  });
+  updatePieCharts();
+}
+
+// ملء dropdown البحث
+function populateFilters(){
+  const companySet = new Set();
+  const yearSet = new Set();
+  candidates.forEach(c=>{
+    c.nominations.forEach(n=>{
+      companySet.add(n.company);
+      yearSet.add(new Date(n.date).getFullYear());
+    });
+  });
+  const companySelect = document.getElementById("searchCompany");
+  companySet.forEach(c=>{companySelect.innerHTML+=`<option value="${c}">${c}</option>`});
+  const yearSelect = document.getElementById("searchYear");
+  Array.from(yearSet).sort().forEach(y=>{yearSelect.innerHTML+=`<option value="${y}">${y}</option>`});
+  // فلتر الرسم البياني
+  const chartCompany = document.getElementById("chartCompanyFilter");
+  const chartYear = document.getElementById("chartYearFilter");
+  companySet.forEach(c=>{chartCompany.innerHTML+=`<option value="${c}">${c}</option>`});
+  Array.from(yearSet).sort().forEach(y=>{chartYear.innerHTML+=`<option value="${y}">${y}</option>`});
+}
+
+// البحث المتقدم + تقرير حسب الحالة
+function filterTables(){
+  const nameF = document.getElementById("searchName").value.toLowerCase();
+  const civilF = document.getElementById("searchCivil").value.toLowerCase();
+  const companyF = document.getElementById("searchCompany").value;
+  const yearF = document.getElementById("searchYear").value;
+  const statusF = document.getElementById("searchStatus").value;
+
+  function filterTable(tableId, status){
+    document.querySelectorAll(`#${tableId} tbody tr`).forEach(row=>{
+      const name = row.cells[0].innerText.toLowerCase();
+      const civil = row.cells[1].innerText.toLowerCase();
+      const companies = row.cells[2].innerText;
+      let yearMatch=true;
+      if(yearF){
+        yearMatch = Array.from(candidates).some(c=>{
+          return c.name===row.cells[0].innerText && c.nominations.some(n=>new Date(n.date).getFullYear()==yearF);
+        });
+      }
+      if(name.includes(nameF) && civil.includes(civilF) &&
+         (companyF==="" || companies.includes(companyF)) &&
+         (statusF==="" || status===statusF)){
+        row.style.display="";
+      } else row.style.display="none";
+    });
+  }
+  filterTable("hiredTable","تم التوظيف");
+  filterTable("rejectedTable","رفض");
+  updatePieCharts();
+}
+
+// التصدير CSV/Excel/PDF
+function exportCSV(type){
+  let csv = "";
+  let rows=[];
+  if(type==="hired"){
+    rows=document.querySelectorAll("#hiredTable tbody tr");
+    csv="الاسم,الرقم المدني,الشركة,المسمى الوظيفي,تاريخ التوظيف\n";
+  } else {
+    rows=document.querySelectorAll("#rejectedTable tbody tr");
+    csv="الاسم,الرقم المدني,الشركة,سبب الرفض,تقدير المقابلة,ملاحظات\n";
+  }
+  rows.forEach(r=>{
+    const cols = Array.from(r.cells).map(c=>`"${c.innerText}"`).join(",");
+    csv+=cols+"\n";
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = type+"_report.csv";
+  link.click();
+}
+function exportExcel(type){ exportCSV(type); }
+function exportPDF(type){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let rows=[];
+  let headers=[];
+  if(type==="hired"){
+    headers=["الاسم","الرقم المدني","الشركة","المسمى الوظيفي","تاريخ التوظيف"];
+    rows=document.querySelectorAll("#hiredTable tbody tr");
+  } else {
+    headers=["الاسم","الرقم المدني","الشركة","سبب الرفض","تقدير المقابلة","ملاحظات"];
+    rows=document.querySelectorAll("#rejectedTable tbody tr");
+  }
+  const data=[];
+  rows.forEach(r=>{data.push(Array.from(r.cells).map(c=>c.innerText));});
+  doc.text(type==="hired"?"تقرير الباحثين الذين تم توظيفهم":"تقرير الباحثين الذين تم رفضهم",14,10);
+  doc.autoTable({head:[headers], body:data, startY:20});
+  doc.save(type+"_report.pdf");
+}
+
+// الرسم البياني العام
+let chartInstance;
+function updateChart(){
+  const companyFilter = document.getElementById("chartCompanyFilter").value;
+  const yearFilter = document.getElementById("chartYearFilter").value;
+  const yearsData = {};
+  candidates.forEach(c=>{
+    c.nominations.forEach(n=>{
+      const y = new Date(n.date).getFullYear();
+      const company = n.company;
+      if((!companyFilter || company===companyFilter) && (!yearFilter || y==yearFilter)){
+        if(!yearsData[y]) yearsData[y] = {total:0, hired:0, rejected:0};
+        yearsData[y].total++;
+        if(c.employment.status==="تم التوظيف") yearsData[y].hired++;
+        if(c.employment.status==="رفض") yearsData[y].rejected++;
+      }
+    });
+  });
+  const labels = Object.keys(yearsData).sort();
+  const totalData = labels.map(y=>yearsData[y].total);
+  const hiredData = labels.map(y=>yearsData[y].hired);
+  const rejectedData = labels.map(y=>yearsData[y].rejected);
+
+  if(chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById('chartCanvas').getContext('2d');
+  chartInstance = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:labels,
+      datasets:[
+        {label:'الترشيحات', data:totalData, backgroundColor:'rgba(54,162,235,0.6)'},
+        {label:'الموظفين', data:hiredData, backgroundColor:'rgba(75,192,192,0.6)'},
+        {label:'المرفوضين', data:rejectedData, backgroundColor:'rgba(255,99,132,0.6)'}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{position:'top'},title:{display:true,text:'الترشيحات حسب السنة وحالة التوظيف'}},
+      scales:{y:{beginAtZero:true}}
+    }
+  });
+}
+
+// الرسم البياني الدائري الصغير لكل سكشن
+let pieHired, pieRejected;
+function updatePieCharts(){
+  const hiredCount = candidates.filter(c=>c.employment.status==="تم التوظيف").length;
+  const rejectedCount = candidates.filter(c=>c.employment.status==="رفض").length;
+  const ctxH = document.getElementById("chartHiredPie").getContext('2d');
+  const ctxR = document.getElementById("chartRejectedPie").getContext('2d');
+  if(pieHired) pieHired.destroy();
+  if(pieRejected) pieRejected.destroy();
+  pieHired = new Chart(ctxH,{type:'doughnut', data:{labels:['تم التوظيف','رفض'], datasets:[{data:[hiredCount,rejectedCount], backgroundColor:['#4bc0c0','#ff6384']}]}, options:{plugins:{legend:{position:'bottom'}}}});
+  pieRejected = new Chart(ctxR,{type:'doughnut', data:{labels:['رفض','تم التوظيف'], datasets:[{data:[rejectedCount,hiredCount], backgroundColor:['#ff6384','#4bc0c0']}]}, options:{plugins:{legend:{position:'bottom'}}}});
+}
+
+// تحميل مكتبة autoTable jsPDF
+const scriptAT = document.createElement('script');
+scriptAT.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js';
+document.head.appendChild(scriptAT);
+
+updateTables();
+populateFilters();
+updateChart();
+</script>
+</body>
+</html>

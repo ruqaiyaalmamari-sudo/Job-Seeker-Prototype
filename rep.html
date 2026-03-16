@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>تقرير الباحثين عن عمل</title>
+<style>
+body {
+  font-family: Arial;
+  direction: rtl;
+  margin: 20px;
+  background: #f4f6f8;
+}
+
+h2 { text-align: center; }
+
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: flex-end;
+}
+
+.search-bar > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-bar label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.search-bar input, .search-bar select {
+  padding: 6px 8px;
+  font-size: 13px;
+  min-width: 120px;
+}
+
+#nominateRow {
+  margin-bottom: 15px;
+}
+
+#nominateRow button, #exportButtons button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 6px 12px;
+  margin-right: 10px;
+}
+
+#nominateRow button:hover, #exportButtons button:hover { background: #0056b3; }
+
+#successMessage {
+  display:none;
+  background:#d4edda;
+  color:#155724;
+  padding:10px;
+  border:1px solid #c3e6cb;
+  border-radius:5px;
+  margin-bottom:10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: center;
+  font-size: 13px;
+}
+
+th { background: #e9ecef; }
+</style>
+</head>
+<body>
+
+<h2>تقرير الباحثين عن عمل</h2>
+
+<!-- سطر البحث -->
+<div class="search-bar">
+  <div><label>الرقم المدني:</label><input type="text" id="filterCivilId" onkeyup="filterTable()"></div>
+  <div><label>الاسم:</label><input type="text" id="filterName" onkeyup="filterTable()"></div>
+  <div><label>التخصص:</label><input type="text" id="filterSpecialization" onkeyup="filterTable()"></div>
+  <div><label>الجامعة:</label><input type="text" id="filterUniversity" onkeyup="filterTable()"></div>
+  <div><label>الدولة:</label><input type="text" id="filterCountry" onkeyup="filterTable()"></div>
+  <div><label>سنة التخرج:</label><input type="number" id="filterGradYear" onkeyup="filterTable()" min="1900" max="2100"></div>
+  <div><label>سنة التسجيل كباحث:</label><input type="number" id="filterRegYear" onkeyup="filterTable()" min="1900" max="2100"></div>
+</div>
+
+<!-- سطر الترشيح -->
+<div id="nominateRow">
+  <label>ترشيح إلى شركة:</label>
+  <select id="companySelect">
+    <option value="">-- اختر شركة --</option>
+    <option>شركة الاتصالات</option>
+    <option>شركة هندسة الشيكات</option>
+    <option>شركة نفط عمان</option>
+    <option>شركة تقنية</option>
+  </select>
+  <button type="button" onclick="nominate()">ترشيح المختارين</button>
+</div>
+
+<div id="successMessage"></div>
+
+<!-- جدول الباحثين -->
+<table id="jobSeekerTable">
+<thead>
+<tr>
+<th>✔</th>
+<th>الرقم المدني</th>
+<th>الاسم الكامل</th>
+<th>التخصص</th>
+<th>الجامعة</th>
+<th>الدولة</th>
+<th>سنة التخرج</th>
+<th>سنة التسجيل كباحث</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input type="checkbox"></td>
+<td>123456789</td>
+<td>
+ <a href="userProfile.html?id=1">أحمد محمد علي</a>
+</td>
+   
+<td>علوم حاسب</td>
+<td>جامعة الكويت</td>
+<td>الكويت</td>
+<td>2022</td>
+<td>2023</td>
+</tr>
+<tr>
+<td><input type="checkbox"></td>
+<td>987654321</td>
+<td>
+ <a href="userProfile.html?id=1">فاطمة سالم الزيدي</a>
+</td>
+<td>هندسة اتصالات</td>
+<td>جامعة السلطان قابوس</td>
+<td>سلطنة عمان</td>
+<td>2021</td>
+<td>2022</td>
+</tr>
+<tr>
+<td><input type="checkbox"></td>
+<td>112233445</td>
+<td> <a href="userProfile.html?id=1">سليمان عبالله الغيثي</a> </td>
+
+<td>هندسة  اتصالات</td>
+<td>جامعة السلطان قابوس</td>
+<td>سلطنة عمان</td>
+<td>2020</td>
+<td>2021</td>
+</tr>
+</tbody>
+</table>
+
+<!-- خيارات التصدير والطباعة -->
+<div id="exportButtons" style="margin-bottom:20px;">
+  <button onclick="exportCSV()">تصدير CSV</button>
+  <button onclick="exportExcel()">تصدير Excel</button>
+  <button onclick="exportPDF()">تصدير PDF</button>
+  <button onclick="printPDF()">طباعة PDF</button>
+</div>
+
+<h3>سجل الترشيحات السابقة</h3>
+<table id="nominationsLog">
+<thead>
+<tr>
+<th>الباحثون المرشحون</th>
+<th>الشركة</th>
+<th>تاريخ الترشيح</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+let nominationsLog = [];
+
+function nominate() {
+  let company = document.getElementById("companySelect").value;
+  if (!company) { alert("يرجى اختيار شركة"); return; }
+
+  let selectedSeekers = [];
+  let rowsData = [];
+  document.querySelectorAll("#jobSeekerTable tbody tr").forEach(row => {
+    let checkbox = row.querySelector("input[type='checkbox']");
+    if (checkbox.checked && row.style.display !== "none") {
+      let civilId = row.cells[1].innerText;
+      let name = row.cells[2].innerText;
+      selectedSeekers.push(name);
+      rowsData.push({ civilId, name });
+    }
+  });
+
+  if (selectedSeekers.length === 0) { alert("يرجى اختيار باحث واحد على الأقل"); return; }
+
+  for (let s of rowsData) {
+    if (nominationsLog.some(n => n.civilId === s.civilId && n.company === company)) {
+      alert(`❌ الباحث ${s.name} تم ترشيحه مسبقًا لنفس الشركة`);
+      return;
+    }
+  }
+
+  if (!confirm("هل أنت متأكد من ترشيح الباحثين التالية أسماؤهم:\n" + selectedSeekers.join("، ") + "\nإلى الشركة:\n" + company)) return;
+
+  let nominationDate = new Date().toLocaleString("ar-KW");
+  rowsData.forEach(s => nominationsLog.push({ civilId: s.civilId, name: s.name, company: company, date: nominationDate }));
+
+  let successDiv = document.getElementById("successMessage");
+  successDiv.style.display = "block";
+  successDiv.innerHTML = "✅ تم الترشيح إلى <b>" + company + "</b>: <ul>" + selectedSeekers.map(n => `<li>${n}</li>`).join("") + "</ul>📅 تاريخ الترشيح: " + nominationDate;
+  setTimeout(() => { successDiv.style.display = "none"; }, 5000);
+
+  document.querySelectorAll("#jobSeekerTable input[type='checkbox']").forEach(cb => cb.checked = false);
+  updateNominationsLog();
+}
+
+function updateNominationsLog() {
+  let tbody = document.querySelector("#nominationsLog tbody");
+  tbody.innerHTML = "";
+  nominationsLog.forEach(entry => {
+    let row = document.createElement("tr");
+    row.innerHTML = `<td>${entry.name}</td><td>${entry.company}</td><td>${entry.date}</td>`;
+    tbody.appendChild(row);
+  });
+}
+
+function filterTable() {
+  const civil = document.getElementById("filterCivilId").value.toLowerCase();
+  const name = document.getElementById("filterName").value.toLowerCase();
+  const spec = document.getElementById("filterSpecialization").value.toLowerCase();
+  const uni = document.getElementById("filterUniversity").value.toLowerCase();
+  const country = document.getElementById("filterCountry").value.toLowerCase();
+  const gradYear = document.getElementById("filterGradYear").value;
+  const regYear = document.getElementById("filterRegYear").value;
+
+  document.querySelectorAll("#jobSeekerTable tbody tr").forEach(row => {
+    let show = true;
+    if(civil && !row.cells[1].innerText.toLowerCase().includes(civil)) show = false;
+    if(name && !row.cells[2].innerText.toLowerCase().includes(name)) show = false;
+    if(spec && !row.cells[3].innerText.toLowerCase().includes(spec)) show = false;
+    if(uni && !row.cells[4].innerText.toLowerCase().includes(uni)) show = false;
+    if(country && !row.cells[5].innerText.toLowerCase().includes(country)) show = false;
+    if(gradYear && !row.cells[6].innerText.includes(gradYear)) show = false;
+    if(regYear && !row.cells[7].innerText.includes(regYear)) show = false;
+    row.style.display = show ? "" : "none";
+  });
+}
+
+// --- دوال التصدير ---
+function exportCSV() {
+  if(nominationsLog.length === 0){ alert("لا يوجد بيانات لترشيحها"); return;}
+  let csv = "الباحثون المرشحون,الشركة,تاريخ الترشيح\n";
+  nominationsLog.forEach(e => { csv += `${e.name},${e.company},${e.date}\n`; });
+  let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "nomination_log.csv";
+  link.click();
+}
+
+function exportExcel() {
+  if(nominationsLog.length === 0){ alert("لا يوجد بيانات لترشيحها"); return;}
+  const ws = XLSX.utils.json_to_sheet(nominationsLog.map(e => ({ "الباحثون المرشحون": e.name, "الشركة": e.company, "تاريخ الترشيح": e.date })));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "الترشيحات");
+  XLSX.writeFile(wb, "nomination_log.xlsx");
+}
+
+function exportPDF() {
+  if(nominationsLog.length === 0){ alert("لا يوجد بيانات لترشيحها"); return;}
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.autoTable({
+    head: [['الباحثون المرشحون','الشركة','تاريخ الترشيح']],
+    body: nominationsLog.map(e => [e.name, e.company, e.date])
+  });
+  doc.save("nomination_log.pdf");
+}
+
+function printPDF() {
+  window.print();
+}
+</script>
+
+</body>
+</html>

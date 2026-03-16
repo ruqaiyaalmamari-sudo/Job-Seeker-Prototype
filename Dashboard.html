@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* =======================
+   Variables & Reset
+======================= */
+:root {
+    --main: #2563eb;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #1e293b;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: "Cairo", Tahoma;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    direction: rtl;
+}
+
+/* =======================
+   Sidebar
+======================= */
+.sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 240px;
+    height: 100%;
+    background: var(--main);
+    color: white;
+    padding: 20px;
+}
+
+.sidebar h3 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* =======================
+   Main Content
+======================= */
+.main {
+    margin-right: 260px;
+    padding: 25px;
+}
+
+/* Top bar */
+.topbar {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* =======================
+   Cards
+======================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-right: 6px solid var(--main);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card i {
+    font-size: 30px;
+    color: var(--main);
+}
+
+.card .title {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.card .number {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* =======================
+   Chart (Small – Admin)
+======================= */
+.chart-box {
+    background: white;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 520px;
+}
+
+.chart-box canvas {
+    height: 240px !important;
+}
+
+/* =======================
+   Responsive
+======================= */
+@media(max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .main {
+        margin-right: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =======================
+     Sidebar
+======================= -->
+<div class="sidebar">
+    <h3>لوحة التحكم</h3>
+    <a href="dashboard.html"><i class="fa fa-chart-line"></i> الرئيسية</a>
+    <a href="rep.html"><i class="fa fa-users"></i> الباحثين عن عمل</a>
+    <a href="companyselect.html"><i class="fa fa-building"></i> الشركات</a>
+	<a href="graduateStudent.html"><i class="fa fa-graduation-cap"></i> الخريجين المتوقعين</a>
+	<a href="employement.html"><i class="fa fa-graduation-line"></i>اجراءات التوظيف من قبل الشركات</a>
+	<a href="evaluation.html"><i class="fa fa-graduation-line"></i>تقييم الباحثين عن عمل</a>
+	<a href="settings.html"><i class="fa fa-gear"></i> الإعدادات</a>
+	
+</div>
+
+<!-- =======================
+     Main
+======================= -->
+<div class="main">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        مرحبًا بك، Admin 👋
+    </div>
+
+    <!-- Cards -->
+    <div class="cards">
+
+        <div class="card" onclick="goTo('rep.html')">
+		
+
+            <i class="fa fa-user"></i>
+            <div class="title">الباحثين عن عمل</div>
+            <div class="number">10.000</div>
+        </div>
+
+        <div class="card" onclick="goTo('acceptReject.html')">
+            <i class="fa fa-check-circle"></i>
+            <div class="title">تقرير الباحثين عن عمل الذين تم ترشيحهم</div>
+            <div class="number">3000</div>
+        </div>
+
+        <div class="card" onclick="goTo('rejected.html')">
+            <i class="fa fa-xmark-circle"></i>
+            <div class="title">مرفوضين</div>
+            <div class="number">500</div>
+        </div>
+
+        <div class="card" onclick="goTo('graduateStudent.html')">
+            <i class="fa fa-graduation-cap"></i>
+            <div class="title">تقرير الخريجين المتوقعين</div>
+            <div class="number">8000</div>
+        </div>
+
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-box">
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
+
+<!-- =======================
+     Scripts
+======================= -->
+<script>
+function goTo(page) {
+    window.location.href = page;
+}
+
+new Chart(document.getElementById("chart"), {
+    type: 'doughnut',
+    data: {
+        labels: ['باحثين', 'موظفين', 'مرفوضين', 'دارسين'],
+        datasets: [{
+            data: [10000, 5000, 3000, 8000],
+            backgroundColor: ['#2563eb', '#16a34a', '#dc2626', '#f59e0b']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+/* ---------- إعدادات أساسية ---------- */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* ---------- Header ---------- */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    margin: 0;
+    color: #1a73e8;
+}
+
+.header span {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ---------- الصورة ---------- */
+.profile-img {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-img img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid #1a73e8;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.profile-img small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+}
+
+/* ---------- Tabs ---------- */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #e6ebf1;
+    border: none;
+    outline: none;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    transition: background-color 0.3s;
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+.tab:hover {
+    background-color: #d0d7e3;
+}
+
+.tab.active {
+    background-color: #1a73e8;
+    color: #fff;
+}
+
+/* ---------- Tab Content ---------- */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ---------- Fieldsets ---------- */
+fieldset {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    background-color: #f9faff;
+}
+
+legend {
+    font-weight: bold;
+    color: #1a73e8;
+    padding: 0 10px;
+}
+
+/* ---------- Form Rows ---------- */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.form-row label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-row input, .form-row textarea, .form-row select {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-row input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* ---------- Columns ---------- */
+.two-cols {
+    display: flex;
+    gap: 20px;
+}
+
+.three-cols {
+    display: flex;
+    gap: 20px;
+}
+
+/* ---------- Tables ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+table th {
+    background-color: #1a73e8;
+    color: #fff;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f1f5fb;
+}
+
+/* ---------- Buttons ---------- */
+button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Tab & action buttons */
+.save-btn {
+    background-color: #1a73e8;
+    color: #fff;
+    margin-right: 10px;
+    padding: 8px 15px;
+}
+
+.print-btn {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 8px 15px;
+}
+
+.edit-btn {
+    background-color: #ffc107;
+    color: #fff;
+    padding: 4px 8px;
+    margin-right: 5px;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: #fff;
+    padding: 4px 8px;
+}
+
+/* ---------- Divider ---------- */
+.divider {
+    border: 1px solid #ccc;
+    margin: 15px 0;
+}
+
+/* ---------- Message ---------- */
+#message {
+    margin-top: 10px;
+    color: green;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ---------- Responsive ---------- */
+@media screen and (max-width: 768px) {
+    .two-cols, .three-cols {
+        flex-direction: column;
+    }
+}
+
+
+/* ---------- Skills Rating ---------- */
+.stars {
+    display: none;
+}
+
+.skills-section {
+    width: 300px;
+    margin-top: 20px;
+}
+
+.skills-section h3 {
+    color: #1a73e8;
+    margin-bottom: 10px;
+}
+
+.skills-section select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.stars {
+    margin-top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+    display: none;
+}
+
+.stars span {
+    color: #ccc;
+    transition: color 0.2s;
+}
+
+.stars span.active {
+    color: gold;
+}

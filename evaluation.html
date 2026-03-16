@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>نتيجة تقييم الكفاءات الفنية للباحث عن عمل </title>
+
+<style>
+body{
+  font-family: Arial;
+  direction: rtl;
+  background:#f4f6f8;
+  margin:20px;
+}
+h2{ text-align:center; }
+
+.section{
+  background:#fff;
+  padding:15px;
+  border-radius:8px;
+  margin-bottom:20px;
+  box-shadow:0 0 8px rgba(0,0,0,.08);
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap:12px;
+}
+
+label{ font-size:13px; color:#333; }
+input, select, textarea{
+  padding:6px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  font-size:13px;
+}
+textarea{ resize:vertical; min-height:60px; }
+
+button{
+  padding:8px 15px;
+  border:none;
+  border-radius:5px;
+  background:#007bff;
+  color:#fff;
+  cursor:pointer;
+}
+button:hover{ background:#0056b3; }
+
+.readonly{
+  background:#f1f1f1;
+}
+
+.success{
+  display:none;
+  background:#d4edda;
+  color:#155724;
+  padding:10px;
+  border-radius:5px;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<h2>تقييم الباحثين عن عمل</h2>
+
+<!-- 🔍 البحث عن الباحث -->
+<div class="section">
+<h3>البحث عن الباحث</h3>
+<div class="form-grid">
+  <div>
+    <label>الرقم المدني</label>
+    <input type="text" id="searchCivil">
+  </div>
+  <div>
+    <label>اسم الباحث</label>
+    <input type="text" id="searchName">
+  </div>
+  <div style="align-self:end">
+    <button onclick="searchSeeker()">بحث</button>
+  </div>
+</div>
+</div>
+
+<!-- 👤 بيانات الباحث -->
+<div class="section">
+<h3>بيانات الباحث (عرض فقط)</h3>
+<div class="form-grid">
+  <div>
+    <label>الاسم الكامل</label>
+    <input type="text" id="name" class="readonly" readonly>
+  </div>
+  <div>
+    <label>الرقم المدني</label>
+    <input type="text" id="civil" class="readonly" readonly>
+  </div>
+  <div>
+    <label>التخصص</label>
+    <input type="text" id="specialization" class="readonly" readonly>
+  </div>
+  <div>
+    <label>الجامعة</label>
+    <input type="text" id="university" class="readonly" readonly>
+  </div>
+  <div>
+    <label>سنة التخرج</label>
+    <input type="text" id="gradYear" class="readonly" readonly>
+  </div>
+</div>
+</div>
+
+<!-- ⭐ نموذج التقييم -->
+<div class="section">
+<h3> تم مقابلته من قبل الهيئة </h3>
+
+<div class="form-grid">
+
+  <div>
+    <label>هل تم تقييمه؟</label>
+    <select id="evaluated">
+      <option value="">-- اختر --</option>
+      <option value="نعم">نعم</option>
+      <option value="لا">لا</option>
+    </select>
+  </div>
+
+  <div>
+    <label>نتيجة التقييم </label>
+    <select id="evaluated">
+      <option value="">-- اختر --</option>
+      <option value="الفئة الأولى">الفئة الأولى</option>
+      <option value="الفئة الثانية">الفئة الثانية</option>
+	     <option value="الفئة الثالثة">الفئة الثالثة</option>
+    </select>
+	
+  </div>
+
+  <div>
+    <label>تصنيف المؤسسة</label>
+    <select id="organizationClass">
+      <option value="">-- اختر --</option>
+      <option>ممتاز</option>
+      <option>جيد جداً</option>
+      <option>جيد</option>
+      <option>مقبول</option>
+    </select>
+  </div>
+
+  <div>
+    <label>الكفاءات الفنية</label>
+    <textarea id="competencies"
+      placeholder="مثال: التحليل، العمل الجماعي، إدارة الوقت"></textarea>
+  </div>
+
+  <div>
+    <label>المهارات الشخصية</label>
+    <textarea id="softSkills"
+      placeholder="مثال: التواصل، القيادة، تحمل الضغط"></textarea>
+  </div>
+
+</div>
+
+<br>
+<button onclick="saveEvaluation()">حفظ التقييم</button>
+
+<div class="success" id="successMsg">
+  ✅ تم حفظ تقييم الباحث بنجاح
+</div>
+
+</div>
+
+<script>
+// بيانات تجريبية للباحثين
+const seekers = [
+  {civil:"123456789", name:"أحمد محمد علي", specialization:"علوم حاسب", university:"جامعة الكويت", gradYear:2022},
+  {civil:"987654321", name:"فاطمة سالم", specialization:"إدارة أعمال", university:"جامعة البحرين", gradYear:2021}
+];
+
+// البحث عن الباحث
+function searchSeeker(){
+  const civil = document.getElementById("searchCivil").value;
+  const name = document.getElementById("searchName").value;
+
+  const seeker = seekers.find(s =>
+    (civil && s.civil === civil) ||
+    (name && s.name.includes(name))
+  );
+
+  if(!seeker){
+    alert("لم يتم العثور على الباحث");
+    return;
+  }
+
+  document.getElementById("name").value = seeker.name;
+  document.getElementById("civil").value = seeker.civil;
+  document.getElementById("specialization").value = seeker.specialization;
+  document.getElementById("university").value = seeker.university;
+  document.getElementById("gradYear").value = seeker.gradYear;
+}
+
+// حفظ التقييم
+function saveEvaluation(){
+  const evaluation = {
+    civil: document.getElementById("civil").value,
+    evaluated: document.getElementById("evaluated").value,
+    score: document.getElementById("score").value,
+    organizationClass: document.getElementById("organizationClass").value,
+    competencies: document.getElementById("competencies").value,
+    softSkills: document.getElementById("softSkills").value,
+    date: new Date().toLocaleString("ar-KW")
+  };
+
+  if(!evaluation.civil){
+    alert("يرجى اختيار باحث أولاً");
+    return;
+  }
+
+  console.log("Evaluation Saved:", evaluation);
+
+  document.getElementById("successMsg").style.display="block";
+  setTimeout(()=> {
+    document.getElementById("successMsg").style.display="none";
+  },3000);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>تقرير الخريجين المتوقعين</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+body { font-family: Arial; direction: rtl; margin:20px; background:#f4f6f8;}
+h2 { text-align:center; margin-bottom:20px;}
+.section { background:#fff; padding:15px; border-radius:8px; margin-bottom:20px;}
+table { width:100%; border-collapse: collapse; margin-bottom:10px;}
+th, td { border:1px solid #ccc; padding:6px; text-align:center; font-size:13px;}
+th { background:#e9ecef; }
+.filter-section { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;}
+.filter-section select, .filter-section input { padding:5px; border-radius:4px; border:1px solid #ccc;}
+.chart-container { width:100%; max-width:600px; margin:auto; }
+button { padding:5px 10px; border:none; border-radius:4px; cursor:pointer; font-size:12px; margin:2px;}
+button.search { background:#007bff; color:#fff;}
+button.search:hover { background:#0056b3;}
+button.export { background:#28a745; color:#fff;}
+button.export:hover { background:#1e7e34;}
+button.print { background:#ffc107; color:#000;}
+button.print:hover { background:#e0a800;}
+</style>
+</head>
+<body>
+
+<h2>تقرير الخريجين المتوقعين</h2>
+
+<!-- فلترة البحث -->
+<div class="section filter-section">
+  <select id="filterSpecialization">
+    <option value="">كل التخصصات</option>
+  </select>
+  <select id="filterUniversity">
+    <option value="">كل الجامعات</option>
+  </select>
+  <select id="filterCountry">
+    <option value="">كل الدول</option>
+  </select>
+  <input type="number" id="filterStartYear" placeholder="سنة الالتحاق">
+  <input type="number" id="filterGradYear" placeholder="سنة التخرج المتوقعة">
+  <button class="search" onclick="applyFilter()">بحث</button>
+</div>
+
+<!-- جدول الباحثين -->
+<div class="section" id="reportSection">
+<table id="graduateTable">
+<thead>
+<tr>
+<th>الرقم المدني</th>
+<th>الاسم الكامل</th>
+<th>التخصص</th>
+<th>الجامعة</th>
+<th>الدولة</th>
+<th>سنة الالتحاق</th>
+<th>سنة التخرج المتوقعة</th>
+</tr>
+</thead>
+<tbody id="tableBody">
+<!-- يتم ملؤها بالـ JS -->
+</tbody>
+</table>
+</div>
+
+<!-- أزرار التصدير والطباعة -->
+<div class="section" style="text-align:center;">
+<button class="export" onclick="exportCSV()">تصدير CSV</button>
+<button class="export" onclick="exportPDF()">تصدير PDF</button>
+<button class="print" onclick="printReport()">طباعة التقرير</button>
+</div>
+
+<!-- الرسم البياني -->
+<div class="section chart-container">
+  <canvas id="graduateChart"></canvas>
+</div>
+
+<script>
+// بيانات مبدئية للطلاب/الخريجين المتوقعين
+let graduates = [
+  {civilId:"123456789", name:" أحمد محمد علي الشبلي ", specialization:"علوم حاسب", university:"جامعة السلطان قابوس", country:"سلطنة عمان", startYear:20120, gradYear:2025},
+  {civilId:"987654321", name:"فاطمة سالم الوهيبي", specialization:"هندسة اتصالات", university:"جامعة السلطان قابوس", country:"سلطنة عمان", startYear:2020, gradYear:2025},
+  {civilId:"112233445", name:"سلمان عبدالله المحروقي", specialization:"هندسة الشبكات", university:"جامعة السلطان قابوس", country:"سلطنة عمان", startYear:2021, gradYear:2025},
+  {civilId:"223344556", name:"ليلى حسين البلوشي", specialization:"علوم حاسب", university:"كلية لندن الجامعية", country:"بريطانيا", startYear:2022, gradYear:2026},
+  {civilId:"334455667", name:"محمد خالد السيفي", specialization:"هندسة اتصالات", university:"جامعة ظفار", country:"سلطنة عمان", startYear:2023, gradYear:2027}
+];
+
+// توليد خيارات الفلترة
+function populateFilters(){
+  const specs = [...new Set(graduates.map(g=>g.specialization))];
+  const unis = [...new Set(graduates.map(g=>g.university))];
+  const countries = [...new Set(graduates.map(g=>g.country))];
+
+  const specSelect = document.getElementById("filterSpecialization");
+  specs.forEach(s=> specSelect.innerHTML += `<option>${s}</option>`);
+
+  const uniSelect = document.getElementById("filterUniversity");
+  unis.forEach(u=> uniSelect.innerHTML += `<option>${u}</option>`);
+
+  const countrySelect = document.getElementById("filterCountry");
+  countries.forEach(c=> countrySelect.innerHTML += `<option>${c}</option>`);
+}
+
+// توليد جدول
+function renderTable(data){
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML="";
+  data.forEach(g=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML=`
+      <td>${g.civilId}</td>
+      <td>${g.name}</td>
+      <td>${g.specialization}</td>
+      <td>${g.university}</td>
+      <td>${g.country}</td>
+      <td>${g.startYear}</td>
+      <td>${g.gradYear}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// فلترة البيانات
+function applyFilter(){
+  const spec = document.getElementById("filterSpecialization").value;
+  const uni = document.getElementById("filterUniversity").value;
+  const country = document.getElementById("filterCountry").value;
+  const startYear = document.getElementById("filterStartYear").value;
+  const gradYear = document.getElementById("filterGradYear").value;
+
+  const filtered = graduates.filter(g=>{
+    return (spec==="" || g.specialization===spec) &&
+           (uni==="" || g.university===uni) &&
+           (country==="" || g.country===country) &&
+           (startYear==="" || g.startYear==parseInt(startYear)) &&
+           (gradYear==="" || g.gradYear==parseInt(gradYear));
+  });
+  renderTable(filtered);
+  drawChart(filtered);
+}
+
+// رسم بياني دائري
+function drawChart(data=graduates){
+  const gradYears = [...new Set(data.map(g=>g.gradYear))].sort();
+  const counts = gradYears.map(y=>data.filter(g=>g.gradYear===y).length);
+
+  const ctx = document.getElementById("graduateChart").getContext('2d');
+  if(window.myChart) window.myChart.destroy(); // إعادة التحديث
+  window.myChart = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels: gradYears,
+      datasets:[{
+        data: counts,
+        backgroundColor: ['#007bff','#28a745','#dc3545','#ffc107','#6f42c1','#17a2b8']
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'top'},
+        title:{display:true, text:'عدد الخريجين المتوقعين حسب سنة التخرج'}
+      }
+    }
+  });
+}
+
+// تصدير CSV
+function exportCSV(){
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "الرقم المدني,الاسم الكامل,التخصص,الجامعة,الدولة,سنة الالتحاق,سنة التخرج\n";
+  const rows = document.querySelectorAll("#graduateTable tbody tr");
+  rows.forEach(row=>{
+    const cols = row.querySelectorAll("td");
+    const rowData = Array.from(cols).map(td=>td.innerText).join(",");
+    csvContent += rowData + "\n";
+  });
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "graduates_report.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// تصدير PDF
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'pt', 'a4');
+  doc.text("تقرير الخريجين المتوقعين", 200, 30);
+  const rows = [];
+  document.querySelectorAll("#graduateTable tbody tr").forEach(tr=>{
+    const cols = tr.querySelectorAll("td");
+    rows.push(Array.from(cols).map(td=>td.innerText));
+  });
+  doc.autoTable({
+    head: [["الرقم المدني","الاسم الكامل","التخصص","الجامعة","الدولة","سنة الالتحاق","سنة التخرج"]],
+    body: rows,
+    startY: 50,
+  });
+  doc.save("graduates_report.pdf");
+}
+
+// طباعة التقرير
+function printReport(){
+  const printContent = document.getElementById("reportSection").innerHTML;
+  const originalContent = document.body.innerHTML;
+  document.body.innerHTML = printContent;
+  window.print();
+  document.body.innerHTML = originalContent;
+  location.reload(); // لإعادة تحميل الصفحة بعد الطباعة
+}
+
+// التهيئة الأولية
+populateFilters();
+renderTable(graduates);
+drawChart();
+</script>
+
+<!-- jsPDF AutoTable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>

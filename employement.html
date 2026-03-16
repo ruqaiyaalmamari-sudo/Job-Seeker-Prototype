@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>نموذج إدارة التوظيف مع سجل وتصدير</title>
+<style>
+body { font-family: Arial; direction: rtl; margin: 20px; background: #f4f6f8; }
+h2, h3 { text-align: center; margin-bottom: 10px; }
+form { background: #fff; padding: 20px; border-radius: 8px; max-width: 900px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 6px; background: #f9f9f9; }
+label { font-weight: bold; }
+.input-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; }
+.input-row > div { flex: 1 1 30%; min-width: 200px; display: flex; flex-direction: column; }
+input, select, textarea { padding: 8px; border-radius: 4px; border:1px solid #ccc; box-sizing: border-box; width: 100%; }
+textarea { resize: vertical; }
+button { background: #007bff; color: #fff; padding: 10px 16px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+button:hover { background: #0056b3; }
+#rejectionSection { display: none; }
+#employmentDates { display: none; }
+#successMessage { display:none; background:#d4edda; color:#155724; padding:10px; border:1px solid #c3e6cb; border-radius:5px; margin-bottom:10px; white-space: pre-line; }
+table { width: 100%; border-collapse: collapse; background: #fff; margin-top:20px; }
+th, td { border: 1px solid #ccc; padding: 6px; text-align: center; font-size: 13px; }
+th { background: #e9ecef; }
+</style>
+</head>
+<body>
+
+<h2>اجراءات التوظيف من قبل الشركات</h2>
+
+<form id="employmentForm">
+
+  <!-- بيانات الباحث -->
+  <section>
+    <h3>بيانات الباحث</h3>
+    <div class="input-row">
+      <div>
+        <label>اختر الباحث:</label>
+        <select id="candidateSelect" onchange="populateCandidateData()">
+          <option value="">-- اختر الباحث --</option>
+        </select>
+      </div>
+      <div>
+        <label>الاسم الكامل:</label>
+        <input type="text" id="candName" readonly>
+      </div>
+      <div>
+        <label>الرقم المدني:</label>
+        <input type="text" id="candCivilId" readonly>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div>
+        <label>التخصص:</label>
+        <input type="text" id="candSpecialization" readonly>
+      </div>
+      <div>
+        <label>الجامعة:</label>
+        <input type="text" id="candUniversity" readonly>
+      </div>
+      <div>
+        <label>الدولة:</label>
+        <input type="text" id="candCountry" readonly>
+      </div>
+    </div>
+  </section>
+
+  <!-- بيانات الوظيفة -->
+  <section>
+    <h3>بيانات الوظيفة</h3>
+    <div class="input-row">
+      <div>
+        <label>رقم الوظيفة:</label>
+        <input type="text" id="jobNumber" placeholder="أدخل رقم الوظيفة">
+      </div>
+      <div>
+        <label>اسم الشركة:</label>
+        <input type="text" id="jobCompany" readonly>
+      </div>
+      <div>
+        <label>المسمى الوظيفي:</label>
+        <select id="jobTitle">
+          <option value="">-- اختر المسمى الوظيفي --</option>
+          <option>مهندس برمجيات</option>
+          <option>محلل نظم</option>
+          <option>مدير مشروع</option>
+          <option>أخصائي تسويق</option>
+          <option>محاسب</option>
+          <option>فني شبكات</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div>
+        <label>حالة التوظيف:</label>
+        <select id="hireStatus" onchange="toggleRejectionSection()">
+          <option value="">-- اختر الحالة --</option>
+          <option value="تم التوظيف">تم التوظيف</option>
+          <option value="رفض">رفض</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-row" id="employmentDates">
+      <div>
+        <label>تاريخ التوظيف:</label>
+        <input type="date" id="hireDate">
+      </div>
+    </div>
+
+    <div id="rejectionSection">
+      <div class="input-row">
+        <div>
+          <label>سبب الرفض:</label>
+          <select id="rejectionReason">
+            <option value="">-- اختر سبب الرفض --</option>
+            <option>لم يستوفِ شروط التوظيف</option>
+            <option>يجب أن يحمل شهادة مهنية</option>
+            <option>اختيار مرشح آخر</option>
+            <option>سبب آخر</option>
+          </select>
+        </div>
+        <div>
+          <label>تقدير المقابلة:</label>
+          <select id="interviewScore">
+            <option value="">-- اختر التقدير --</option>
+            <option>جيد جدًا</option>
+            <option>جيد</option>
+            <option>متوسط</option>
+            <option>ضعيف</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>ملاحظات:</label>
+        <textarea id="rejectionNotes" rows="2" placeholder="يمكن كتابة ملاحظات إضافية"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <button type="button" onclick="submitEmployment()">حفظ بيانات التوظيف</button>
+</form>
+
+<div id="successMessage"></div>
+
+<!-- جدول سجل التوظيفات -->
+<h3 style="text-align:center;">سجل التوظيفات والرفض</h3>
+<div style="text-align:center; margin-bottom:10px;">
+  <button onclick="exportCSV()">تصدير CSV</button>
+  <button onclick="exportExcel()">تصدير Excel</button>
+  <button onclick="exportPDF()">تصدير PDF</button>
+</div>
+<table id="employmentLogTable">
+  <thead>
+    <tr>
+      <th>رقم الوظيفة</th>
+      <th>الاسم</th>
+      <th>الرقم المدني</th>
+      <th>الشركة</th>
+      <th>المسمى الوظيفي</th>
+      <th>الحالة</th>
+      <th>تاريخ التوظيف</th>
+      <th>سبب الرفض</th>
+      <th>تقدير المقابلة</th>
+      <th>ملاحظات</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// الترشيحات السابقة
+const nominationsLog = [
+  {name:"أحمد محمد علي", civilId:"123456789", specialization:"علوم حاسب", university:"جامعة الكويت", country:"الكويت", company:"شركة الاتصالات"},
+  {name:"فاطمة سالم", civilId:"987654321", specialization:"إدارة أعمال", university:"جامعة البحرين", country:"البحرين", company:"بنك الخليج"},
+  {name:"سلمان عبدالله", civilId:"112233445", specialization:"هندسة كهربائية", university:"جامعة الكويت", country:"الكويت", company:"شركة تقنية"}
+];
+
+// سجل التوظيفات
+const employmentRecords = [];
+
+// ملء قائمة الباحثين من الترشيحات
+const candidateSelect = document.getElementById("candidateSelect");
+nominationsLog.forEach((c,i)=>{ 
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.text = `${c.name} - ${c.company}`;
+  candidateSelect.add(opt);
+});
+
+function populateCandidateData(){
+  const idx = candidateSelect.value;
+  if(idx === "") return;
+  const c = nominationsLog[idx];
+  document.getElementById("candName").value = c.name;
+  document.getElementById("candCivilId").value = c.civilId;
+  document.getElementById("candSpecialization").value = c.specialization;
+  document.getElementById("candUniversity").value = c.university;
+  document.getElementById("candCountry").value = c.country;
+  document.getElementById("jobCompany").value = c.company;
+}
+
+function toggleRejectionSection(){
+  const status = document.getElementById("hireStatus").value;
+  document.getElementById("rejectionSection").style.display = status==="رفض"?"block":"none";
+  document.getElementById("employmentDates").style.display = status==="تم التوظيف"?"flex":"none";
+}
+
+function submitEmployment(){
+  const name = document.getElementById("candName").value;
+  const civilId = document.getElementById("candCivilId").value;
+  const company = document.getElementById("jobCompany").value;
+  const jobTitle = document.getElementById("jobTitle").value;
+  const jobNumber = document.getElementById("jobNumber").value;
+  const status = document.getElementById("hireStatus").value;
+  const hireDate = document.getElementById("hireDate").value;
+  const rejectionReason = document.getElementById("rejectionReason").value;
+  const notes = document.getElementById("rejectionNotes").value;
+  const interviewScore = document.getElementById("interviewScore").value;
+
+  if(!name || !civilId || !company || !jobTitle || !status || !jobNumber){
+    alert("يرجى ملء الحقول الأساسية");
+    return;
+  }
+
+  // حفظ السجل داخليًا
+  const record = {jobNumber,name,civilId,company,jobTitle,status,hireDate,rejectionReason,interviewScore,notes};
+  employmentRecords.push(record);
+  addRecordToTable(record);
+
+  // رسالة نجاح
+  document.getElementById("successMessage").style.display = "block";
+  document.getElementById("successMessage").innerText = "✅ تم حفظ بيانات التوظيف بنجاح!";
+  setTimeout(()=>{document.getElementById("successMessage").style.display="none";},4000);
+
+  document.getElementById("employmentForm").reset();
+  document.getElementById("rejectionSection").style.display="none";
+  document.getElementById("employmentDates").style.display="none";
+}
+
+function addRecordToTable(record){
+  const tbody = document.querySelector("#employmentLogTable tbody");
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${record.jobNumber}</td>
+    <td>${record.name}</td>
+    <td>${record.civilId}</td>
+    <td>${record.company}</td>
+    <td>${record.jobTitle}</td>
+    <td>${record.status}</td>
+    <td>${record.hireDate || ""}</td>
+    <td>${record.rejectionReason || ""}</td>
+    <td>${record.interviewScore || ""}</td>
+    <td>${record.notes || ""}</td>
+  `;
+  tbody.appendChild(tr);
+}
+
+// التصدير CSV
+function exportCSV(){
+  let csv = "رقم الوظيفة,الاسم,الرقم المدني,الشركة,المسمى الوظيفي,الحالة,تاريخ التوظيف,سبب الرفض,تقدير المقابلة,ملاحظات\n";
+  employmentRecords.forEach(r=>{
+    csv += `"${r.jobNumber}","${r.name}","${r.civilId}","${r.company}","${r.jobTitle}","${r.status}","${r.hireDate || ''}","${r.rejectionReason || ''}","${r.interviewScore || ''}","${r.notes || ''}"\n`;
+  });
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "employment_records.csv";
+  link.click();
+}
+
+// التصدير Excel (بسيط كملف CSV)
+function exportExcel(){
+  exportCSV(); // يمكن فتح CSV مباشرة في Excel
+}
+
+// التصدير PDF
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 10;
+  doc.setFontSize(10);
+  doc.text("سجل التوظيفات والرفض", 105, y, {align:"center"});
+  y += 10;
+  employmentRecords.forEach((r,i)=>{
+    const text = `${i+1}. رقم الوظيفة: ${r.jobNumber}, الاسم: ${r.name}, الشركة: ${r.company}, الحالة: ${r.status}`;
+    doc.text(text, 10, y);
+    y += 7;
+    if(y>280){ doc.addPage(); y=10;}
+  });
+  doc.save("employment_records.pdf");
+}
+</script>
+
+</body>
+</html>
